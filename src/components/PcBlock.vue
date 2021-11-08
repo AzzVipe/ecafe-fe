@@ -1,0 +1,140 @@
+<template>
+	<div class="pc-image">
+		<div v-if="isImageLoading || isProcessing" class="loading loading-middle"></div>
+		<img v-else id="image" :src="'/client/screenshot?id='+ client.id">
+	</div>
+	<div class="pc-body-title">{{client.username}}</div>
+	<div class="param-keyvalue-body">
+		<div class="param-keys">
+			<p class="param-key">IP address:</p>
+			<p class="param-key">Status:</p>
+			<p class="param-key">Up time:</p>
+		</div>
+		<div class="param-values">
+			<p class="param-value">{{ client.ip }}</p>
+			<p
+				class="param-value"
+				:class="[client.status === 'online' ? 'pc-is-active' : 'pc-is-inactive']">
+				<i class="ri-checkbox-blank-circle-fill" style="font-size: 8px"></i> {{ client.status }}
+			</p>
+			<p class="param-value">{{ upTime }}</p>
+		</div>
+	</div>
+	<div class="pc-capsule-container">
+		<div class="pc-capsule action-button">
+			<div class="pc-select pc-capsule-left">
+				<select name="actions" v-model="action" class="actions">
+
+					<option value="0" selected="" disabled="">Action</option>
+					<option v-for="a in getActions()" :value="a" :key="a.cmd">{{ a.name }}</option>
+
+				</select>
+				<i class="ri-arrow-down-s-line icon"></i>
+			</div>
+			<button @click="doAction()" type="submit" :class="{'is-loading': isPerformingAction}" class="button pc-capsule-right">
+				<i class="ri-play-fill icon-play"></i>
+			</button>
+		</div>
+	</div>
+	<div v-if="showToast" class="toast" :class="[toastStatus ? 'is-success' : 'is-danger']">
+		{{ msg }}
+	</div>
+
+</template>
+
+<script>
+	import { actions, performAction } from '../actions.js';
+	export default {
+		name: "PcBlock",
+		props: ["client", "isProcessing"],
+		emits: ['refetchClient'],
+
+		data() {
+			return {
+				imgUrl: "/client/screenshot?id=",
+				isImageLoading: false,
+				screenshotImage: null,
+				isPerformingAction: false,
+				showToast: false,
+				toastStatus: false,
+				msg: "",
+				action: "0",
+				actions: actions,
+			};
+		},
+
+		methods: {
+			getImage(data) {
+				this.screenshotImage = data;
+				let image = document.getElementById("image");
+				console.log(image);
+			},
+			getActions() {
+				const result = this.actions.filter((item) => {
+					if (this.client.status === 'online' && item.cmd === 'unlock') {
+						return false;
+					} else if (this.client.status === 'offline' && item.cmd === 'lock') {
+						return false;
+					}
+
+					return true;
+				});
+				
+				return result;
+			},
+
+			doAction() {
+				const param = new URLSearchParams();
+				param.append('id', this.client.id);
+
+				this.isPerformingAction = true;
+
+				if (this.action.cmd == 'screenshot') {
+					this.isImageLoading = true;
+				}
+
+				performAction(this.action, param).then((response) => {
+					this.toastStatus = true;
+					if (this.action.cmd == 'lock' || this.action.cmd == 'unlock' )
+						this.$emit('refetchClient');
+
+					if (this.action.cmd == 'screenshot') {
+						let screenShot = Document.querySelector("#image");
+						console.log("screenShot",screenShot);
+					}
+					if (response.data.message)
+						this.msg = response.data.message;
+
+				}).catch((error) => {
+					this.toastStatus = false;
+					this.msg = error.data.message;
+				}).finally(() => {
+					this.action = "0";
+					this.isPerformingAction = false;
+					this.isImageLoading = false;
+					this.showToast = true;
+					setTimeout(() => {
+						this.showToast = false;
+						this.msg = "";
+					}, 4000);
+				});
+			},
+
+		},
+
+		computed: {
+			upTime() {
+				if (this.client && !this.client.uptime) {
+					return "";
+				}
+
+				const days = parseInt(this.client.uptime / 86400);
+				const hours = parseInt((this.client.uptime / 3600) - (days * 24));
+				const mins = parseInt((this.client.uptime / 60) - (days * 1440) - (hours * 60));
+
+
+				return `${days}d:${hours}h:${mins}m`;
+			}
+		},
+	}
+</script>
