@@ -33,7 +33,7 @@ import ClientHeader from '../components/ClientHeader.vue';
 import ClientBlock from '../components/ClientBlock.vue';
 import TaskBar from '../components/TaskBar.vue';
 import axios from 'axios';
-import { actions } from '../actions.js';
+import { actions, performAction } from '../actions.js';
 
 export default {
 	name: "Home",
@@ -73,70 +73,27 @@ export default {
 		},
 
 		shutDown() {
-			// const param = new URLSearchParams();
-			// param.append('id', this.client.id);
-			
 			this.actions.forEach((action) => {
 				if (action.cmd === 'poweroff') {
-					this.performAction(action);
+					this.clients.forEach((client) => {
+						const param = new URLSearchParams();
+						param.append('id', client.id);
+						this.doAction(action, param);
+					})
 				}
 			})
 		},
 
-		// doAction(action) {
-		// 	const param = new URLSearchParams();
-		// 	param.append('id', this.client.id);
+		doAction(action, param) {
 
-		// 	performAction(action, param).then((response) => {
-		// 		this.toastStatus = true;
-		// 		this.msg = response.data.message;
-		
-		// 	}).catch((error) => {
-		// 		this.toastStatus = false;
-		// 		this.msg = error.data.message;
-		// 	}).finally(() => {
-		// 		this.showToast = true;
-		// 		setTimeout(() => {
-		// 			this.showToast = false;
-		// 			this.msg = "";
-		// 		}, 4000);
-		// 	});
-		// },
-
-		performAction(action) {
-			console.log(action.name, action.cmd);
-
-			if (action.onRequest) {
-				action.onRequest(this);
-			}
-			if (action.canSendRequest) {
-				this.clients.forEach((client) => {
-					this.sendRequest(action, {client: client});
-				});
-			}
-		},
-
-		sendRequest(action, data = {}) {
-			let url = `/client/${action.cmd}?id=${data.client.id}`;
-			if (data) {
-				url = `${url}&${data.toString()}`;
-			}
-			axios.get(url).then((response) => {
-				// console.log(response);
-				if (action.onResponse) {
-					action.onResponse(response.data);
-				}
+			performAction(action, param).then((response) => {
 				this.toastStatus = true;
-				if (response.data.message) {
-					this.msg = response.data.message;
-				}
+				this.msg = response.data.message;
+		
 			}).catch((error) => {
-				console.error(error);
 				this.toastStatus = false;
-				// @TODO
 				this.msg = error.data.message;
 			}).finally(() => {
-				this.action = "0";
 				this.showToast = true;
 				setTimeout(() => {
 					this.showToast = false;

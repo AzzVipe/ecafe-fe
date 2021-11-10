@@ -26,13 +26,6 @@
 					<button class="button is-sm">
 						<i class="ri-lock-fill"></i>
 					</button>
-					<!-- <button class="button is-sm capsule-right">
-						<span class="elipses">
-							<span class="elipse"></span>
-							<span class="elipse"></span>
-							<span class="elipse"></span>
-						</span>
-					</button> -->
 				</div>
 			</div>
 		</div>

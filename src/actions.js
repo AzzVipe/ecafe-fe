@@ -5,39 +5,45 @@ const actions = [
 		name: "Lock",
 		cmd: "lock",
 		onRequest: null,
-		onResponse: () => {
-			// instance.$emit('refetchClient');
-		},
+		onResponse: null,
+		overrideResponseHandler: false,
 		canSendRequest: true,
+		canShowToast: true,
 	},
 	{
 		name: "Unlock",
 		cmd: "unlock",
-		onRequest: null,
-		onResponse: () => {
-			// instance.$emit('refetchClient');
-		},
+		overrideResponseHandler: false,
 		canSendRequest: true,
+		onRequest: null,
+		onResponse: null,
+		canShowToast: true,
 	},
 	{
 		name: "Ping",
 		cmd: "ping",
 		canSendRequest: true,
+		overrideResponseHandler: false,
+		canShowToast: true,
 	},
 	{
 		name: "Poweroff",
 		cmd: "poweroff",
 		canSendRequest: true,
+		overrideResponseHandler: false,
+		canShowToast: true,
 	},
 	{
 		name: "Message",
 		cmd: "message",
 		canSendRequest: false,
+		overrideResponseHandler: false,
 		onRequest: (action, data) => {
 			let msg = prompt("Write your message");
 			data.append("msg", msg);
 			return sendRequest(action, data);
 		},
+		canShowToast: true,
 	},
 	{
 		name: "Screenshot",
@@ -45,10 +51,10 @@ const actions = [
 		// onRequest: (instance) => {
 		// 	instance.isImageLoading = true;
 		// },
-		// onResponse: (instance) => {
-		// 	instance.isImageLoading = false;
-		// },
+		onResponse: null,
 		canSendRequest: true,
+		overrideResponseHandler: true,
+		canShowToast: false,
 	},
 ];
 
@@ -60,8 +66,7 @@ function sendRequest(action, data) {
 		axios.get(url).then((response) => {
 
 			if (action.onResponse) {
-				// action.onResponse(response.data);
-				action.onResponse(action);
+				action.onResponse(action, response);
 			}
 			resolve(response);
 			// this.toastStatus = true;

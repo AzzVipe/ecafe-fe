@@ -89,34 +89,36 @@
 
 				this.isPerformingAction = true;
 
-				if (this.action.cmd == 'screenshot') {
-					this.isImageLoading = true;
+				if (this.action.overrideResponseHandler) {
+					this.action.onResponse = (action, response) => {
+						// @TODO Show image
+						console.log("SCREENSHOT", action, response);
+					}
 				}
 
 				performAction(this.action, param).then((response) => {
-					this.toastStatus = true;
 					if (this.action.cmd == 'lock' || this.action.cmd == 'unlock' )
 						this.$emit('refetchClient');
 
-					if (this.action.cmd == 'screenshot') {
-						let screenShot = Document.querySelector("#image");
-						console.log("screenShot",screenShot);
-					}
-					if (response.data.message)
+					if (!this.action.overrideResponseHandler && response.data.message) {
+						this.toastStatus = true;
 						this.msg = response.data.message;
+					}
 
 				}).catch((error) => {
 					this.toastStatus = false;
 					this.msg = error.data.message;
 				}).finally(() => {
+					if (this.action.canShowToast) {
+						this.showToast = true;
+						setTimeout(() => {
+							this.showToast = false;
+							this.msg = "";
+						}, 4000);
+					}
 					this.action = "0";
 					this.isPerformingAction = false;
 					this.isImageLoading = false;
-					this.showToast = true;
-					setTimeout(() => {
-						this.showToast = false;
-						this.msg = "";
-					}, 4000);
 				});
 			},
 
