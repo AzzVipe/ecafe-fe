@@ -9,6 +9,8 @@ const actions = [
 		overrideResponseHandler: false,
 		canSendRequest: true,
 		canShowToast: true,
+		neadRefresh: true,
+		massActionable: true,
 	},
 	{
 		name: "Unlock",
@@ -18,43 +20,56 @@ const actions = [
 		onRequest: null,
 		onResponse: null,
 		canShowToast: true,
+		neadRefresh: true,
+		massActionable: true,
 	},
 	{
 		name: "Ping",
 		cmd: "ping",
+		onRequest: null,
+		onResponse: null,
 		canSendRequest: true,
 		overrideResponseHandler: false,
 		canShowToast: true,
+		neadRefresh: false,
+		massActionable: true,
 	},
 	{
 		name: "Poweroff",
 		cmd: "poweroff",
+		onRequest: null,
+		onResponse: null,
 		canSendRequest: true,
 		overrideResponseHandler: false,
 		canShowToast: true,
+		neadRefresh: true,
+		massActionable: true,
 	},
 	{
 		name: "Message",
 		cmd: "message",
-		canSendRequest: false,
-		overrideResponseHandler: false,
 		onRequest: (action, data) => {
 			let msg = prompt("Write your message");
 			data.append("msg", msg);
 			return sendRequest(action, data);
 		},
+		onResponse: null,
+		canSendRequest: false,
+		overrideResponseHandler: false,
 		canShowToast: true,
+		neadRefresh: false,
+		massActionable: false,
 	},
 	{
 		name: "Screenshot",
 		cmd: "screenshot",
-		// onRequest: (instance) => {
-		// 	instance.isImageLoading = true;
-		// },
+		onRequest: null,
 		onResponse: null,
 		canSendRequest: true,
 		overrideResponseHandler: true,
 		canShowToast: false,
+		neadRefresh: false,
+		massActionable: false,
 	},
 ];
 

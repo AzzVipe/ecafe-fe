@@ -22,9 +22,9 @@
 				</p>
 			</div>
 			<div class="client-actions">
-				<div class="capsule">
-					<button class="button is-sm">
-						<i class="ri-lock-fill"></i>
+				<div class="capsule" @click="emitStatusChangedEvent">
+					<button class="button is-sm" :class="[client.status === 'online' ? 'is-active-bg' : 'is-inactive-bg']">
+						<i :class="[client.status === 'online' ? 'ri-lock-fill' : 'ri-lock-unlock-fill']"/>
 					</button>
 				</div>
 			</div>
@@ -37,5 +37,16 @@
 export default {
 	name: "ClientBlock",
 	props: ["client"],
+	emits: ['lockClient', 'unlockClient'],
+
+	methods: {
+		emitStatusChangedEvent() {
+			if (this.client.status === 'online') {
+				this.$emit('lockClient');
+			} else {
+				this.$emit('unlockClient');
+			}
+		}
+	},
 }
 </script>

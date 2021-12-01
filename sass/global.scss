@@ -10,9 +10,16 @@
 	box-sizing: border-box;
 }
 
-.pc-is-active {
-	color: #74c180;
+.is-active {
+	color: #67A771;
 }
-.pc-is-inactive {
+.is-inactive {
 	color: #b95b5b;
+}
+
+.is-active-bg {
+	background-color: #67A771;
+}
+.is-inactive-bg {
+	background-color: #b95b5b;
 }

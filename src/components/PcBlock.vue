@@ -1,7 +1,7 @@
 <template>
 	<div class="pc-image">
 		<div v-if="isImageLoading || isProcessing" class="loading loading-middle"></div>
-		<img v-else id="image" :src="'/client/screenshot?id='+ client.id">
+		<img v-else id="image" :src="'/client/screenshot?id='+ client.id + '&v=' + v">
 	</div>
 	<div class="pc-body-title">{{client.username}}</div>
 	<div class="param-keyvalue-body">
@@ -14,7 +14,7 @@
 			<p class="param-value">{{ client.ip }}</p>
 			<p
 				class="param-value"
-				:class="[client.status === 'online' ? 'pc-is-active' : 'pc-is-inactive']">
+				:class="[client.status === 'online' ? 'is-active' : 'is-inactive']">
 				<i class="ri-checkbox-blank-circle-fill" style="font-size: 8px"></i> {{ client.status }}
 			</p>
 			<p class="param-value">{{ upTime }}</p>
@@ -60,6 +60,7 @@
 				msg: "",
 				action: "0",
 				actions: actions,
+				v: 0,
 			};
 		},
 
@@ -89,15 +90,23 @@
 
 				this.isPerformingAction = true;
 
-				if (this.action.overrideResponseHandler) {
-					this.action.onResponse = (action, response) => {
-						// @TODO Show image
-						console.log("SCREENSHOT", action, response);
-					}
+				// if (this.action.overrideResponseHandler) {
+				// 	this.action.onResponse = (action, response) => {
+				// 		// @TODO Show image
+				// 		console.log("SCREENSHOT", action, response);
+				// 	}
+				// }
+
+				if (this.action.cmd === 'screenshot') {
+					this.v += 1;
+					this.isImageLoading = true;
+					setTimeout(() => {
+						this.isImageLoading = false;
+					}, 500);
 				}
 
 				performAction(this.action, param).then((response) => {
-					if (this.action.cmd == 'lock' || this.action.cmd == 'unlock' )
+					if (this.action.neadRefresh)
 						this.$emit('refetchClient');
 
 					if (!this.action.overrideResponseHandler && response.data.message) {

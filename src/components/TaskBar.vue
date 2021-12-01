@@ -1,4 +1,5 @@
 <template>
+
 	<div class="taskbar-container">
 		<div class="counts-container">
 			<label class="checkbox">
@@ -19,21 +20,38 @@
 			</div>
 		</div>
 
-		<div>
-			<router-link to='/user' style="width: 20px; display: block;">
+		<div class="taskbar-menu-icon has-status-online mode-light">
+			<!-- <router-link to='/user' style="width: 20px; display: block;">
 				<i class="ri-menu-line taskbar-menu-icon"></i>
-			</router-link>
+			</router-link> -->
+			<i class="ri-menu-line"></i>
+			<div class="dropdown">
+				<div class="dropdown-wrapper">
+					<div class="dropdown-menu">
+						<a v-for="a in filteredActions" @click="$emit('fire-action', a)" :key="a.cmd" class="dropdown-menu-item">{{ a.name }}</a>
+						<!-- <a v @click="$emit('fire-action', 'unlock')" class="dropdown-menu-item">Unlock</a>
+						<a v @click="$emit('fire-action', 'ping')" class="dropdown-menu-item">Ping</a>
+						<a v @click="$emit('fire-action', 'poweroff')" class="dropdown-menu-item">Shutdown</a> -->
+					</div>
+				</div>
+			</div>
 		</div>
-
-
 	</div>
+
 </template>
 
 <script>
 
 export default {
 	name: "TaskBar",
-	props: ['nClients', 'nOnline', 'nOffline'],
+	props: ['nClients', 'nOnline', 'nOffline', 'actions'],
+	emits: ['fire-action'],
+
+	computed: {
+		filteredActions() {
+			return this.actions.filter((action) => action.massActionable);
+		}
+	},
 
 }
 
